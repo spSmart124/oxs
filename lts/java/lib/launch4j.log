@@ -1,0 +1,36 @@
+
+
+Version:	3.50
+CmdLine:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\vfl.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	1.017.000_012
+Java max ver:	
+JRE paths:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686
+Check launcher:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686\bin\javaw.exe (OK)
+Version string: 1.017.000_012 / 32-Bit (OK)
+Launcher:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686\bin\javaw.exe
+Launcher args:	-jar "C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\vfl.exe" --spring.config.location="C:\Users\srpradhan\vfl\conf\application.properties" >>"C:\Users\srpradhan\vfl\log\vfl_server.log" 2>&1
+Args length:	197/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\vfl.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	1.017.000_012
+Java max ver:	
+JRE paths:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686
+Check launcher:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686\bin\javaw.exe (OK)
+Version string: 1.017.000_012 / 32-Bit (OK)
+Launcher:	C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\jre\zulu17.52.17-ca-jre17.0.12-win_i686\bin\javaw.exe
+Launcher args:	-jar "C:\Users\srpradhan\Desktop\oxs\build\vfl\lts\java\lib\vfl.exe" --spring.config.location="C:\Users\srpradhan\vfl\conf\application.properties" >>"C:\Users\srpradhan\vfl\log\vfl_server.log" 2>&1
+Args length:	197/32768 chars
+Exit code:	0

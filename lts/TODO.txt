@@ -1,0 +1,11 @@
+Create an installation script to peform below action.
+
+Create a folder for the app | Completed | 2024-12-04
+Copy required files to app location | Inprogress | 2024-12-04
+Copy required files to app location | Completed | 2025-01-02
+Copy server_start.cmd to shell:startup location
+check path variable to confirm app.file.editor.application (Notepad++.exe) is present if not add it
+start the application
+
+VFL wiki: https://infawiki.informatica.com/display/GCS/VFL
+ROBOT-A wiki: https://infawiki.informatica.com/display/GCS/PlugIn+-+RoBoT-A

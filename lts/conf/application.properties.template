@@ -1,0 +1,12 @@
+"spring.application.name"="vfl"
+"app.work.path"="C:\\Users\\srpradhan\\Desktop\\Work\\CAI\\"
+
+"template.file.start"="case"
+"template.file.end"="pointer"
+"template.file.delimiter"="-"
+"template.file.extension"=".txt"
+
+#Application name in the OS used to open folder created
+"app.file.explorer.application"="Explorer.exe"
+#Application name in the OS used to open file created in an editor
+"app.file.editor.application"="notepad++.exe"
