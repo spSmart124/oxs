@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jrt-fs1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lts/java/jre/zulu17.52.17-ca-jre17.0.12-win_i686/lib/jrt-fs.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
