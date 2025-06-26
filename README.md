@@ -27,11 +27,10 @@ Sribatsa Pradhan
 <!-- CONTACT -->
 ## Contact
 
-Your Name - Sribatsa Pradhan - srpradhan@informatica.com
+Your Name - Sribatsa Pradhan
 
 ## Installation Steps
-1. Open sharepoint link 
-https://informatica-my.sharepoint.com/:f:/p/srpradhan/EpUxhB1rFP5Aoad7B_sH_3sB_PrMqI6lkU5EzlqdNfDnUA
+1. Open sharepoint link
 1. Sign in if required
 1. Click on "Add shortcut to Onedrive"
 1. Open "Windows Explored" in your laptop
