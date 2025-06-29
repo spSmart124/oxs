@@ -34,5 +34,5 @@ Your Name - Sribatsa Pradhan
 1. Sign in if required
 1. Click on "Add shortcut to Onedrive"
 1. Open "Windows Explored" in your laptop
-1. Click on "OneDrive - Informatica"
+1. Click on "OneDrive"
 1. Right click on "vfl" and click on "Always Keep on this device"
