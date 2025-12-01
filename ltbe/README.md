@@ -19,4 +19,4 @@ Sribatsa Pradhan
 <!-- CONTACT -->
 ## Contact
 
-Your Name - Sribatsa Pradhan
+Your Name - Sribatsa Pradhan - srpradhan@informatica.com
