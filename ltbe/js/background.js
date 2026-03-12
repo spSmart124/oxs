@@ -23,42 +23,30 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.contextMenus.onClicked.addListener(function (item, tab) {
   // ...check the URL of the active tab against our pattern and...
-  // console.log("OnClickData");
-  // console.log(item);
-  // console.log("tab");
-  // console.log(tab);
   if (item.menuItemId == "vfl") {
-    getCaseDetail().then((response) => {
-      // console.log("forCECase: " + response.caseNumber);
-      // let caseNum = response.caseNumber.split(" ")[0];
-      // console.log('caseNum: ' + caseNum);
-      console.log("CONFIG.appUrl: " + CONFIG.appUrl);
-      console.log("response: " + response);
+    getSfTemplateRecordFromTab().then((response) => {
+      let sfObjType = response.sfObjType;
+      let templateUrl = "";
+      switch (sfObjType) {
+        case SF_OBJECT_TYPE.CASE:
+          templateUrl = CONFIG.appUrl + CONFIG.casePath;
+          break;
+        case SF_OBJECT_TYPE.ENGAGEMENT:
+          templateUrl = CONFIG.appUrl + CONFIG.engagementPath;
+          break;
+        default:
+          console.error("Unknown sf object type: " + sfObjType);
+      }
 
       // Call the template API
       const templateApi = async () => {
-        console.log("CONFIG.appUrl: " + CONFIG.appUrl);
-        const templateApiResponse = await fetch(CONFIG.appUrl, {
+        const templateApiResponse = await fetch(templateUrl, {
           method: "POST",
-          body: JSON.stringify({
-            caseNo: response.caseNumber.split(" ")[0],
-            // "caseNo": "04654789_test11",
-            orgId: response.orgId,
-            // "orgId": "0vTDw2LPOM6jSvJCbmyQSe",
-            pod: response.POD,
-            runtimeEnvironment: response.secureAgent,
-            OSFamily: "",
-            issue: response.problemStatement,
-            description: response.description,
-            observation: "",
-          }),
+          body: JSON.stringify(response.template),
           headers: {
             "Content-Type": "application/json",
           },
         });
-
-        console.log("Template creationg started.");
-        console.log(templateApiResponse);
       };
 
       templateApi();
@@ -67,83 +55,142 @@ chrome.contextMenus.onClicked.addListener(function (item, tab) {
   }
 });
 
-function getCaseDetail() {
+async function querySfObjUsingCookie(tabs, encodedQuery) {
+  let cookie = await getCookie(tabs[0].url, "sid");
+  const instanceUrl = "https://infa.my.salesforce.com";
+  const apiVersion = "v61.0"; // e.g., v61.0
+  const sessionId = cookie.sid;
+
+  // Construct the full endpoint URL
+  const endpoint = `${instanceUrl}/services/data/${apiVersion}/query?q=${encodedQuery}`;
+  console.log("Inside querySfObjUsingCookie. endpoint: "); // Remove later
+  console.log(endpoint);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionId}`, // Use the session ID as a Bearer token
+      },
+    });
+
+    // console.log("response: ");
+    // console.log(response);
+
+    if (!response.ok) {
+      // Handle HTTP error responses (e.g., 401, 403, 404)
+      const errorBody = await response.json();
+      throw new Error(
+        `API call failed: ${response.status} ${response.statusText} - ${errorBody[0]?.message || ""
+        }`
+      );
+    }
+    // return data.records; // Returns an array of records
+    const data = await response.json();
+    console.log("Inside querySfObjUsingCookie. data: "); // Remove later
+    console.log(data); // Remove later
+    return data.records;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+
+function getSfObjTypeFromTab(tabs) {
+  let tabUrl = new URL(tabs[0].url);
+  switch (tabUrl.pathname.split("/")[3]) {
+    case SF_OBJECT_TYPE.CASE:
+      return SF_OBJECT_TYPE.CASE;
+    case SF_OBJECT_TYPE.ENGAGEMENT:
+      return SF_OBJECT_TYPE.ENGAGEMENT;
+    default:
+      return SF_OBJECT_TYPE.UNKNOWN;
+
+  }
+}
+
+function prepareEncodedSoqlByObjTypeFromTab(tabs) {
+  let objId = "";
+  let tabUrl = new URL(tabs[0].url);
+  let sfObjType = getSfObjTypeFromTab(tabs);
+  if (sfObjType == SF_OBJECT_TYPE.CASE || SF_OBJECT_TYPE.ENGAGEMENT) {
+    objId = tabUrl.pathname.split("/")[4];
+  } else {
+    console.error("Be in Force.com case tab!! Url does not contain Case or Engagement__c");
+  }
+
+  // Prepare soql query based on sf object type
+  let soqlQuery = "";
+  if (sfObjType == SF_OBJECT_TYPE.CASE) {
+    soqlQuery = `SELECT Secure_Agent__c, Org_POD_Location__c, Subject, Description, Org_ID__c,Org_Formula_Id__c,Case_Number__c,owner.email,LastModifiedBy.Manager.Email FROM Case WHERE Id = '${objId}'`;
+  } else if (sfObjType == SF_OBJECT_TYPE.ENGAGEMENT) {
+    soqlQuery = `SELECT FIELDS(ALL) FROM Engagement__c WHERE Id = '${objId}'`;
+  } else {
+    console.error("Unhandled object type: " + tabs);
+  }
+
+  return encodeURIComponent(soqlQuery);;
+}
+
+function getCaseTemplateRecord(record) {
+  return {
+    "sfObjType": SF_OBJECT_TYPE.CASE,
+    "template": {
+    caseNo: record.Case_Number__c.split(" ")[0],
+    orgId: record.Org_ID__c
+      ? record.Org_ID__c
+      : record.Org_Formula_Id__c,
+    pod: record.Org_POD_Location__c,
+    runtimeEnvironment: record.Secure_Agent__c,
+    OSFamily: "",
+    issue: record.Subject,
+    description: record.Description,
+    observation: ""
+    }
+  };
+}
+
+function getEngagementTemplateRecord(record) {
+  return {
+    "sfObjType": SF_OBJECT_TYPE.ENGAGEMENT,
+    "template": {
+      number: record.Engagement_Number__c,
+      name: record.Name,
+      account: record.Dev_Plan_Name__c.split("_")[0],
+      description: record.CSM_Summary__c,
+      csaComments: record.CST_Comments__c,
+      closingNotes: record.Closing_Notes__c
+    }
+  };
+}
+
+function getTemplateRecord(sfObjType, records) {
+  let record = records[0];
+  switch(sfObjType) {
+    case "Case":
+      return getCaseTemplateRecord(record);
+    case "Engagement__c":
+      return getEngagementTemplateRecord(record);
+  }
+}
+
+function getSfTemplateRecordFromTab() {
   return new Promise(function (resolve, reject) {
     chrome.tabs.query(
       { active: true, currentWindow: true },
       async function (tabs) {
-        let caseId = "";
-        let tabUrl = new URL(tabs[0].url);
-        console.log("tabUrl: " + tabUrl);
-        // let serverUrl = "https://infa.my.salesforce.com";
-        if (tabUrl.pathname.split("/")[3] == "Case") {
-          caseId = tabUrl.pathname.split("/")[4];
-          console.log("url split: " + tabUrl.pathname.split("/"));
-          console.log("caseId: " + caseId);
-          let cookie = await getCookie(tabs[0].url, "sid");
-          const instanceUrl = "https://infa.my.salesforce.com";
-          const apiVersion = "v61.0"; // e.g., v61.0
-          const sessionId = cookie.sid;
+        let sfObjType = getSfObjTypeFromTab(tabs);
+        const encodedQuery = prepareEncodedSoqlByObjTypeFromTab(tabs);
+        let records = await querySfObjUsingCookie(tabs, encodedQuery);
+        let templateRecord = getTemplateRecord(sfObjType, records);
 
-          // Encode the SOQL query for safe URL transmission
-          const soqlQuery = `SELECT Secure_Agent__c, Org_POD_Location__c, Subject, Description, Org_ID__c,Org_Formula_Id__c,Case_Number__c,owner.email,LastModifiedBy.Manager.Email FROM Case WHERE Id = '${caseId}'`;
-          const encodedQuery = encodeURIComponent(soqlQuery);
-
-          // Construct the full endpoint URL
-          const endpoint = `${instanceUrl}/services/data/${apiVersion}/query?q=${encodedQuery}`;
-
-          try {
-            const response = await fetch(endpoint, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${sessionId}`, // Use the session ID as a Bearer token
-              },
-            });
-
-            // console.log("response: ");
-            // console.log(response);
-
-            if (!response.ok) {
-              // Handle HTTP error responses (e.g., 401, 403, 404)
-              const errorBody = await response.json();
-              throw new Error(
-                `API call failed: ${response.status} ${response.statusText} - ${
-                  errorBody[0]?.message || ""
-                }`
-              );
-            }
-
-            const data = await response.json();
-            console.log("Query Results:", data.records);
-
-            resolve({
-              status: 200,
-              orgId: data.records[0].Org_ID__c
-                ? data.records[0].Org_ID__c
-                : data.records[0].Org_Formula_Id__c,
-              caseNumber: data.records[0].Case_Number__c,
-              email: data.records[0].Owner.Email,
-              managerEmail: data.records[0].LastModifiedBy.Manager
-                ? data.records[0].LastModifiedBy.Manager.Email
-                : "",
-              secureAgent: data.records[0].Secure_Agent__c,
-              POD: data.records[0].Org_POD_Location__c,
-              problemStatement: data.records[0].Subject,
-              description: data.records[0].Description,
-            });
-            // return data.records; // Returns an array of records
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            throw error;
-          }
-        } else {
-          alert("Be in Force.com case tab.!!");
-        }
+        resolve(templateRecord);
       }
     );
   });
 }
+
 
 function getCookie(iurl, key) {
   return new Promise(function (resolve, reject) {

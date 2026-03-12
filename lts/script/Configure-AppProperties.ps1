@@ -58,10 +58,12 @@ $hashProperties = @{
 # "app.work.path"="C:\\Users\\srpradhan\\Desktop\\Work\\CAI\\"
 "app.work.path"="$doubleSlashReplacedAppWorkPath"
 # "app.work.path"="$appWorkPath"
-"template.file.start"="case"
+# "template.file.start"="case"
 "template.file.end"="pointer"
 "template.file.delimiter"="-"
-"template.file.extension"=".txt"
+# "template.file.extension"=".txt"
+"template.file.format"="JSON"
+"server.port"="8080"
 
 #Application name in the OS used to open folder created
 "app.file.explorer.application"="Explorer.exe"
