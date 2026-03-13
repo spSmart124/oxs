@@ -123,9 +123,10 @@ function prepareEncodedSoqlByObjTypeFromTab(tabs) {
   // Prepare soql query based on sf object type
   let soqlQuery = "";
   if (sfObjType == SF_OBJECT_TYPE.CASE) {
-    soqlQuery = `SELECT Secure_Agent__c, Org_POD_Location__c, Subject, Description, Org_ID__c,Org_Formula_Id__c,Case_Number__c,owner.email,LastModifiedBy.Manager.Email FROM Case WHERE Id = '${objId}'`;
+    soqlQuery = `SELECT Secure_Agent__c, Org_POD_Location__c, Subject, Description, Org_ID__c, Org_Formula_Id__c, Case_Number__c FROM ${SF_OBJECT_TYPE.CASE} WHERE Id = '${objId}'`;
   } else if (sfObjType == SF_OBJECT_TYPE.ENGAGEMENT) {
-    soqlQuery = `SELECT FIELDS(ALL) FROM Engagement__c WHERE Id = '${objId}'`;
+    soqlQuery = `SELECT Engagement_Number__c, Name, Dev_Plan_Name__c, CSM_Summary__c, CST_Comments__c, Closing_Notes__c FROM ${SF_OBJECT_TYPE.ENGAGEMENT} WHERE Id = '${objId}'`;
+    // soqlQuery = `SELECT FIELDS(ALL) FROM Engagement__c WHERE Id = '${objId}'`;
   } else {
     console.error("Unhandled object type: " + tabs);
   }
